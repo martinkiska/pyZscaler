@@ -5,5 +5,6 @@ __contributors__ = [
 ]
 __version__ = "0.10.0"
 
-from .zia import ZIA
-from .zpa import ZPA
+from pyzscaler.cspm import ZCSPM
+from pyzscaler.zia import ZIA
+from pyzscaler.zpa import ZPA
