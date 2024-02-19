@@ -1,6 +1,6 @@
 import pytest
 import responses
-from box import Box, BoxList
+from box import BoxList
 
 from tests.conftest import stub_sleep
 
