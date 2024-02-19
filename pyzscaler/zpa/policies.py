@@ -368,6 +368,68 @@ class PolicySetsAPI(APIEndpoint):
 
         return self._post(f"policySet/{policy_id}/rule", json=payload)
 
+    def add_isolation_rule(self, name: str, action: str, policy_set_id: str, zpn_isolation_profile_id: str, **kwargs) -> Box:
+        """
+        Add a new Isolation Policy rule.
+
+        See the
+        `ZPA Isolation Policy API reference <https://help.zscaler.com/zpa/configuring-isolation-policies-using-api>`_
+        for further detail on optional keyword parameter structures.
+
+        Args:
+            name (str):
+                The name of the new rule.
+            action (str):
+                The action for the policy. Accepted values are:
+
+                |  ``ISOLATION``
+                |  ``BYPASS_ISOLATION``
+            policy_set_id (str):
+                Isolation policy set ID.
+            zpn_isolation_profile_id (str):
+                ID of isolation profile.
+            **kwargs:
+                Optional keyword args.
+
+        Keyword Args:
+            conditions (list):
+                A list of conditional rule tuples. Tuples must follow the convention: `Object Type`, `LHS value`,
+                `RHS value`. If you are adding multiple values for the same object type then you will need
+                a new entry for each value. One condition ('client_type', 'id', 'zpn_client_type_exporter')
+                is mandatory for Isolation policy rules.
+                E.g.
+
+                .. code-block:: python
+
+                    [[('APP', 'id', '288262342519554659'), ('APP', 'id', '288262342519554418'), 'OR'],
+                    ('app_group', 'id', '926196382959075332),
+                    ,
+                    ('trusted_network', 'b15e4cad-fa6e-8182-9fc3-8125ee6a65e1', True)]
+            description (str):
+                A description for the rule.
+
+        Returns:
+            :obj:`Box`: The resource record of the newly created Isolation Policy rule.
+
+        """
+
+        # Initialise the payload
+        payload = {
+            "name": name,
+            "action": action.upper(),
+            "policySetId": policy_set_id,
+            "zpnIsolationProfileId": zpn_isolation_profile_id,
+            "conditions": self._create_conditions(kwargs.pop("conditions", [])),
+        }
+        # Get the policy id of the provided policy type for the URL.
+        policy_id = self.get_policy("isolation").id
+
+        # Add optional parameters to payload
+        for key, value in kwargs.items():
+            payload[snake_to_camel(key)] = value
+
+        return self._post(f"policySet/{policy_id}/rule", json=payload)
+
     def update_rule(self, policy_type: str, rule_id: str, **kwargs) -> Box:
         """
         Update an existing policy rule.
