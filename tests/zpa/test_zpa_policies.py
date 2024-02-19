@@ -336,13 +336,20 @@ def test_add_isolation_policy_rule(zpa, policies, policy_rules):
                     "name": "Test",
                     "action": "BYPASS",
                     "description": "Test",
+                    "policySetId": "123",
+                    "zpnIsolationProfileId": "321",
                     "conditions": [{"operands": [{"objectType": "APP_GROUP", "lhs": "id", "rhs": "1"}]}],
                 }
             )
         ],
     )
-    resp = zpa.policies.add_client_forwarding_rule(
-        name="Test", action="intercept", conditions=[("app_group", "id", "1")], description="Test"
+    resp = zpa.policies.add_isolation_rule(
+        name="Test",
+        action="bypass",
+        policy_set_id="123",
+        zpn_isolation_profile_id="321",
+        conditions=[("app_group", "id", "1")],
+        description="Test",
     )
 
     assert isinstance(resp, Box)

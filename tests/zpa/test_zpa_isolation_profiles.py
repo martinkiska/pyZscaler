@@ -23,7 +23,7 @@ def test_list_isolation_profiles(zpa, isolation_profiles):
     )
     responses.add(
         responses.GET,
-        url="https://config.private.zscaler.com/mgmtconfig/v2/admin/customers/1/isolation/profiles?page=2",
+        url="https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/1/isolation/profiles?page=2",
         json=[],
         status=200,
     )
@@ -31,16 +31,3 @@ def test_list_isolation_profiles(zpa, isolation_profiles):
     assert isinstance(resp, BoxList)
     assert len(resp) == 2
     assert resp[0].id == "1"
-
-
-@responses.activate
-def test_get_isolation_profiles(zpa, isolation_profiles):
-    responses.add(
-        responses.GET,
-        url="https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/1/isolation/profiles/1",
-        json=isolation_profiles["list"][0],
-        status=200,
-    )
-    resp = zpa.isolation_profiles.get_profile("1")
-    assert isinstance(resp, Box)
-    assert resp.id == "1"

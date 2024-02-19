@@ -10,6 +10,7 @@ class PolicySetsAPI(APIEndpoint):
         "timeout": "TIMEOUT_POLICY",
         "client_forwarding": "CLIENT_FORWARDING_POLICY",
         "siem": "SIEM_POLICY",
+        "isolation": "ISOLATION_POLICY",
     }
 
     def _create_conditions(self, conditions: list) -> list:
