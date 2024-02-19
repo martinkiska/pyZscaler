@@ -1,4 +1,4 @@
-from box import Box, BoxList
+from box import BoxList
 from restfly import APISession
 from restfly.endpoint import APIEndpoint
 
@@ -13,7 +13,7 @@ class IsolationProfilesAPI(APIEndpoint):
 
     def list_profiles(self, **kwargs) -> BoxList:
         """
-        Returns a list of all configured posture profiles.
+        Returns a list of all configured isolation profiles.
 
         Keyword Args:
             **max_items (int):
@@ -26,7 +26,7 @@ class IsolationProfilesAPI(APIEndpoint):
                 The search string used to match against features and fields.
 
         Returns:
-            :obj:`BoxList`: A list of all configured posture profiles.
+            :obj:`BoxList`: A list of all configured isolation profiles.
 
         Examples:
             >>> for isolation_profile in zpa.isolation_profiles.list_profiles():
