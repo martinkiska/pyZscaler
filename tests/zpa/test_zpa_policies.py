@@ -317,6 +317,39 @@ def test_add_client_forwarding_policy_rule(zpa, policies, policy_rules):
 
 
 @responses.activate
+def test_add_isolation_policy_rule(zpa, policies, policy_rules):
+    responses.add(
+        responses.GET,
+        url="https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/1/policySet/policyType/ISOLATION_POLICY",  # noqa: E501
+        json=policies["list"][2],
+        status=200,
+    )
+
+    responses.add(
+        responses.POST,
+        url="https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/1/policySet/3/rule",
+        json=policy_rules["list"][0],
+        status=200,
+        match=[
+            matchers.json_params_matcher(
+                {
+                    "name": "Test",
+                    "action": "BYPASS",
+                    "description": "Test",
+                    "conditions": [{"operands": [{"objectType": "APP_GROUP", "lhs": "id", "rhs": "1"}]}],
+                }
+            )
+        ],
+    )
+    resp = zpa.policies.add_client_forwarding_rule(
+        name="Test", action="intercept", conditions=[("app_group", "id", "1")], description="Test"
+    )
+
+    assert isinstance(resp, Box)
+    assert resp.id == "1"
+
+
+@responses.activate
 def test_update_policy_rule(zpa, policies, policy_rules):
     updated_rule = policy_rules["list"][0]
     updated_rule["description"] = "Updated Test"
