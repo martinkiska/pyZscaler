@@ -373,7 +373,7 @@ class PolicySetsAPI(APIEndpoint):
 
         return self._post(f"policySet/{policy_id}/rule", json=payload)
 
-    def add_isolation_rule(self, name: str, action: str, policy_set_id: str, zpn_isolation_profile_id: str, **kwargs) -> Box:
+    def add_isolation_rule(self, name: str, action: str, zpn_isolation_profile_id: str, **kwargs) -> Box:
         """
         Add a new Isolation Policy rule.
 
@@ -389,8 +389,6 @@ class PolicySetsAPI(APIEndpoint):
 
                 |  ``ISOLATION``
                 |  ``BYPASS_ISOLATION``
-            policy_set_id (str):
-                Isolation policy set ID.
             zpn_isolation_profile_id (str):
                 ID of isolation profile.
             **kwargs:
@@ -418,16 +416,17 @@ class PolicySetsAPI(APIEndpoint):
 
         """
 
+        # Get the policy id of the provided policy type for the URL.
+        policy_id = self.get_policy("isolation").id
+
         # Initialise the payload
         payload = {
             "name": name,
             "action": action.upper(),
-            "policySetId": policy_set_id,
+            "policySetId": policy_id,
             "zpnIsolationProfileId": zpn_isolation_profile_id,
             "conditions": self._create_conditions(kwargs.pop("conditions", [])),
         }
-        # Get the policy id of the provided policy type for the URL.
-        policy_id = self.get_policy("isolation").id
 
         # Add optional parameters to payload
         for key, value in kwargs.items():

@@ -10,7 +10,7 @@ from tests.conftest import stub_sleep
 
 @pytest.fixture(name="policies")
 def fixture_policies():
-    return {"totalPages": 1, "list": [{"id": "1"}, {"id": "2"}, {"id": "3"}]}
+    return {"totalPages": 1, "list": [{"id": "1"}, {"id": "2"}, {"id": "3"}, {"id": "4"}]}
 
 
 @pytest.fixture(name="policy_conditions")
@@ -321,13 +321,13 @@ def test_add_isolation_policy_rule(zpa, policies, policy_rules):
     responses.add(
         responses.GET,
         url="https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/1/policySet/policyType/ISOLATION_POLICY",  # noqa: E501
-        json=policies["list"][2],
+        json=policies["list"][3],
         status=200,
     )
 
     responses.add(
         responses.POST,
-        url="https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/1/policySet/3/rule",
+        url="https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/1/policySet/4/rule",
         json=policy_rules["list"][0],
         status=200,
         match=[
@@ -336,9 +336,21 @@ def test_add_isolation_policy_rule(zpa, policies, policy_rules):
                     "name": "Test",
                     "action": "BYPASS",
                     "description": "Test",
-                    "policySetId": "123",
                     "zpnIsolationProfileId": "321",
-                    "conditions": [{"operands": [{"objectType": "APP_GROUP", "lhs": "id", "rhs": "1"}]}],
+                    "policySetId": "4",
+                    "conditions": [
+                        {
+                            "operands": [
+                                {"objectType": "APP", "lhs": "id", "rhs": "1"},
+                                {"objectType": "APP", "lhs": "id", "rhs": "2"},
+                            ],
+                            "operator": "OR",
+                        },
+                        {
+                            "operands": [{"objectType": "CLIENT_TYPE", "lhs": "id", "rhs": "zpn_client_type_exporter"}],
+                            "operator": "OR",
+                        },
+                    ],
                 }
             )
         ],
@@ -346,9 +358,11 @@ def test_add_isolation_policy_rule(zpa, policies, policy_rules):
     resp = zpa.policies.add_isolation_rule(
         name="Test",
         action="bypass",
-        policy_set_id="123",
         zpn_isolation_profile_id="321",
-        conditions=[("app_group", "id", "1")],
+        conditions=[
+            [("APP", "id", "1"), ("APP", "id", "2"), "OR"],
+            [("client_type", "id", "zpn_client_type_exporter"), "OR"],
+        ],
         description="Test",
     )
 
